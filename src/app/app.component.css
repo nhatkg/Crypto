@@ -1,0 +1,108 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+*, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background: white;
+    font-family: 'Open Sans', sans-serif;
+  }
+  table {
+    background: white;
+    border-radius: 0.25em;
+    border-collapse: collapse;
+    margin: 1em;
+    width: 100%;
+  }
+  th {
+    border-bottom: 1px solid #364043;
+    color: #E2B842;
+    font-size: 0.85em;
+    font-weight: 600;
+    padding: 0.5em 1em;
+    text-align: left;
+  }
+  td {
+    color: black;
+    font-weight: 400;
+    padding: 0.65em 1em;
+  }
+  
+  tbody tr {
+    transition: background 0.25s ease;
+  }
+  tbody tr:hover {
+    background: white;
+  }
+  
+  .red {
+    color: red;
+  }
+  
+  .white {
+    color: white;
+  }
+  
+  .blue{
+    color: blue;
+  }
+
+  @keyframes loader-animation {
+    0% {
+        left: -100%;
+    }
+    49% {
+        left: 100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: -100%;
+    }
+}
+.loader {
+    height: 5px;
+    width: 100%;
+    overflow: hidden;
+}
+.loader .bar {
+    position: relative;
+    height: 5px;
+    width: 100%;
+    background-color: dodgerblue;
+    animation-name: loader-animation;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+.pagination{
+  right: 0;
+  display: flex;
+  list-style-type: none;
+
+}
+.page-item{
+  border: 1px solid;
+}
+.pagination{
+  display: flex;
+
+  justify-content: center;
+}
+.buttonPagi{
+  width: 40px;
+}
+.buttonPagi:hover{
+  background-color: dodgerblue;
+  cursor: pointer;
+}
+.active{
+  background-color: dodgerblue;
+}

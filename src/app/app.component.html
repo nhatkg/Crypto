@@ -1,0 +1,44 @@
+<div class="loader" *ngIf="isLoading">
+<div class="bar"></div>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>ID 
+      <th>Symbol  
+      <th>Price Change 
+      <th>Open Time 
+      <th>Open Day  
+      <th>Close Time  
+      <th>Close Day
+      <th><input type="text" [(ngModel)]="userFilter" (ngModelChange)="filterControl.next($event)" placeholder="Search Crypto">
+        <th> <select name="" (change)="onChange($event)">
+          <option *ngFor="let option of options">{{option}}</option>
+        </select>
+  </thead>
+  <tbody>
+   
+    <tr *ngFor=" let id = index; let data of DataSlice "> 
+        
+      <td>{{data.index}}
+      <td  [ngClass]="((data.priceChange  >= 0))?'blue':'red'" >{{data.symbol}}
+      <td   [ngClass]="((data.priceChange >= 0))?'blue':'red'">{{data.priceChange | percent : "1.1-2" }}
+      <td [ngClass]="((data.priceChange  >= 0))?'blue':'red'">{{data.openTime | date:'h:mm a'}}
+      <td [ngClass]="((data.priceChange  >= 0))?'blue':'red'">{{data.openTime | date:'EEEE, MMMM d, y'}}
+      <td [ngClass]="((data.priceChange  >= 0))?'blue':'red'">{{data.closeTime | date:'h:mm a'}}
+      <td [ngClass]="((data.priceChange  >= 0))?'blue':'red'">{{data.closeTime | date:'EEEE, MMMM d, y'}}
+        <td>
+      </tr>   
+  </tbody>
+ 
+</table>
+<div class="pagination">
+  <button (click)="prevPage()">prev</button>
+  <button class="buttonPagi active truncate" *ngFor="let page of numbers " (click) ="changePage(page)" [class.active]=" page == selectedPage ">
+ {{(page)}}
+</button> 
+<button (click)="nextPage()">next</button>
+</div>
+
+
+<router-outlet></router-outlet>
