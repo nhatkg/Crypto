@@ -22,6 +22,9 @@ export class AppComponent implements OnInit {
   handlePage: number = 1;
   ArrayN: any = [];
   totalPage: number = 1;
+  editPrev: boolean = false;
+  editNext: boolean = false;
+  totalRecord: any;
   constructor(private product: ProductService) {}
   ngOnInit(): void {
     this.getAll();
@@ -33,8 +36,6 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       this.product.getData().subscribe((res) => {
         this.showData = res;
-        console.log(this.showData);
-
         this.showData = this.showData.filter((item: any) => {
           let isItem = item.symbol.includes('USD') && item.volume != 0;
           return isItem;
@@ -46,6 +47,8 @@ export class AppComponent implements OnInit {
         });
         this.isLoading = false;
         this.DataSlice = this.showData;
+        this.totalRecord = this.showData.length;
+
         this.numbers = [1];
         this.selectedPage = 1;
       });
@@ -57,36 +60,38 @@ export class AppComponent implements OnInit {
       this.numbers = [];
 
       this.userFilter = value.trim().toLowerCase();
-      if (this.userFilter === '') {
-        this.DataSlice = this.showData;
-        this.selectedPage = 1;
-      } else if (this.userFilter) {
+      if (this.userFilter) {
         this.DataSlice = this.showData.filter((data: any) =>
           data.symbol.toString().toLowerCase().includes(this.userFilter)
         );
+        this.totalRecord = this.DataSlice.length;
+        this.changePage(1);
+      } else {
+        this.DataSlice = this.showData;
+        this.totalRecord = this.DataSlice.length;
+        this.changePage(1);
+
       }
     });
   }
   //selected handle
   onChange(event: any) {
     this.handlePage = Number(event.target.value);
-    console.log('this.handlePage', this.handlePage);
-
-    this.numbers = [];
-
-    this.DataSlice = this.showData.slice(0, event.target.value);
-    for (
-      let i = 1;
-      i < Math.ceil(this.showData.length / this.handlePage) + 1;
-      i++
-    ) {
-      this.numbers.push(i);
+    this.selectedPage = 1;
+    if (event.target.value == 'All') {
+      this.DataSlice = this.showData;
+      this.totalRecord = this.showData.length;
+      this.selectedPage = 1;
+      return;
     }
+
+    this.createArrayPaginationArray(this.totalRecord);
+    this.changePage(this.selectedPage);
   }
-  createArrayPaginationArray() {
-    this.totalPage = Math.ceil(this.DataSlice.length / this.handlePage);
-    console.log('this.totalPage', this.totalPage);
-    this.selectedPage;
+  createArrayPaginationArray(totalRecord: any) {
+    this.totalPage = Math.ceil(totalRecord / this.handlePage);
+  
+
     switch (true) {
       case this.totalPage <= 7: {
         const arr = [];
@@ -121,18 +126,48 @@ export class AppComponent implements OnInit {
 
   //changePage handle
   changePage(page: number) {
+    if (page == 1 && this.numbers.length == 1) {
+      this.editPrev = true;
+      this.editNext = true;
+    } else if (page == 1) {
+      this.editPrev = true;
+      this.editNext = false;
+    } else if (page == 1 && this.numbers.length > 1) {
+      // truong hop pagination length
+      this.editPrev = true;
+    } else if (page == Math.ceil(this.showData.length / this.handlePage)) {
+      this.editNext = true;
+      this.editPrev = false;
+    } else {
+      this.editPrev = false;
+      this.editNext = false;
+    }
+
     this.selectedPage = page;
     let pageIndex = (page - 1) * this.handlePage;
 
     let endPageIndex = (page - 1) * this.handlePage + this.handlePage;
+    this.createArrayPaginationArray(this.totalRecord);
     this.DataSlice = [];
-
+    if (this.userFilter) {
+      const dataSearch = this.showData.filter((data: any) =>
+        data.symbol.toString().toLowerCase().includes(this.userFilter)
+      );
+      // this.totalRecord = this.DataSlice.length;
+      this.DataSlice = dataSearch.slice(pageIndex, endPageIndex);
+      return;
+    }
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
   }
   // Prev page
   prevPage() {
     this.selectedPage = this.selectedPage - 1;
-
+    if (this.selectedPage == 1) {
+      this.editPrev = true;
+    } else {
+      this.editPrev = false;
+      this.editNext = false;
+    }
     let pageIndex = (this.selectedPage - 1) * this.handlePage;
 
     let endPageIndex =
@@ -140,11 +175,20 @@ export class AppComponent implements OnInit {
 
     this.DataSlice = [];
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
+    this.createArrayPaginationArray(this.totalRecord);
   }
   // Next page
   nextPage() {
     this.selectedPage = this.selectedPage + 1;
 
+    if (
+      this.selectedPage === Math.ceil(this.showData.length / this.handlePage)
+    ) {
+      this.editNext = true;
+    } else {
+      this.editNext = false;
+      this.editPrev = false;
+    }
     let pageIndex = (this.selectedPage - 1) * this.handlePage;
 
     let endPageIndex =
@@ -152,7 +196,7 @@ export class AppComponent implements OnInit {
 
     this.DataSlice = [];
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
-    this.createArrayPaginationArray();
+    this.createArrayPaginationArray(this.showData);
   }
   // sortData() {
   //   if (this.reverse) {

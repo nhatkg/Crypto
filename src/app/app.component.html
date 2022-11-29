@@ -2,10 +2,11 @@
   <div class="bar"></div>
 </div>
 <table>
-  <thead>
+  <thead class="navbarTable">
     <tr>
       <th>ID</th>
       <th>Symbol</th>
+      <th>Open Price</th>
       <th>Price Change</th>
       <th>Open Time</th>
       <th>Open Day</th>
@@ -33,6 +34,7 @@
       <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">
         {{ data.symbol }}
       </td>
+      <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">{{data.openPrice}}</td>
       <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">
         {{ data.priceChange | percent: "1.1-2" }}
       </td>
@@ -40,20 +42,21 @@
         {{ data.openTime | date: "h:mm a" }}
       </td>
       <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">
-        {{ data.openTime | date: "EEEE, MMMM d, y" }}
+        {{ data.openTime | date: "dd/MM/yyyy" }}
       </td>
       <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">
         {{ data.closeTime | date: "h:mm a" }}
       </td>
       <td [ngClass]="data.priceChange >= 0 ? 'blue' : 'red'">
-        {{ data.closeTime | date: "EEEE, MMMM d, y" }}
+        {{ data.closeTime | date: "dd/MM/yyyy" }}
       </td>
       <td></td>
     </tr>
   </tbody>
 </table>
 <div class="paginationContainer">
-  <button (click)="prevPage()">prev</button>
+
+  <button  [disabled]="editPrev ? true: false"  (click)="prevPage()" >prev</button>
   <div
     class="pagination"
     *ngFor="let page of numbers"
@@ -68,7 +71,8 @@
     </button>
     <span *ngIf="page == '...'">...</span>
   </div>
-  <button (click)="nextPage()">next</button>
+  <button  [disabled]="editNext ? true: false"  (click)="nextPage()">next</button>
+ 
 </div>
 
 <router-outlet></router-outlet>

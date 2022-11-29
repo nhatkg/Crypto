@@ -17,9 +17,16 @@
     background: white;
     border-radius: 0.25em;
     border-collapse: collapse;
-    margin: 1em;
+    margin: 0;
     width: 100%;
   }
+  .navbarTable{
+    background: #434242;
+  }
+  ::placeholder{
+    color: #E2B842;
+  }
+  
   th {
     border-bottom: 1px solid #364043;
     color: #E2B842;
