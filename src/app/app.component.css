@@ -8,7 +8,11 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
+ .header{
+  display: flex;
+  justify-content: space-around;
+  background-color: #CFFDE1;
+ }
   body {
     background: white;
     font-family: 'Open Sans', sans-serif;
@@ -34,6 +38,7 @@
     font-weight: 600;
     padding: 0.5em 1em;
     text-align: left;
+    height: 60px;
   }
   td {
     color: black;
@@ -110,4 +115,9 @@
 }
 .active{
   background-color: dodgerblue;
+}
+.footer{
+  height: 24px;
+  display: flex;
+  justify-content: center;
 }

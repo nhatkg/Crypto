@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
   isLoading = false;
   filterControl = new Subject<string>();
   reverse: boolean = true;
+  isDes:boolean = false;
   options = ['All', 10, 20, 50];
   numbers: any = [];
   selectedPage = 1;
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
   editPrev: boolean = false;
   editNext: boolean = false;
   totalRecord: any;
+  newArray:any;
   constructor(private product: ProductService) {}
   ngOnInit(): void {
     this.getAll();
@@ -48,7 +50,7 @@ export class AppComponent implements OnInit {
         this.isLoading = false;
         this.DataSlice = this.showData;
         this.totalRecord = this.showData.length;
-
+        this.handlePage = this.totalRecord
         this.numbers = [1];
         this.selectedPage = 1;
       });
@@ -77,16 +79,22 @@ export class AppComponent implements OnInit {
   //selected handle
   onChange(event: any) {
     this.handlePage = Number(event.target.value);
+    console.log('this.handlepage', this.handlePage);
+    
     this.selectedPage = 1;
     if (event.target.value == 'All') {
       this.DataSlice = this.showData;
       this.totalRecord = this.showData.length;
+      this.handlePage = this.totalRecord
       this.selectedPage = 1;
-      return;
+      this.createArrayPaginationArray(this.totalRecord);
+      this.changePage(this.selectedPage);
+    }else {
+      this.createArrayPaginationArray(this.totalRecord);
+      this.changePage(this.selectedPage);
     }
+    
 
-    this.createArrayPaginationArray(this.totalRecord);
-    this.changePage(this.selectedPage);
   }
   createArrayPaginationArray(totalRecord: any) {
     this.totalPage = Math.ceil(totalRecord / this.handlePage);
@@ -104,7 +112,9 @@ export class AppComponent implements OnInit {
       case this.totalPage > 7: {
         if (this.selectedPage == this.totalPage) {
           this.numbers = [1, '...', this.totalPage];
-        } else if (this.selectedPage >= 4 && this.totalPage - 3) {
+        }
+         else if (this.selectedPage >= 4 && this.selectedPage < this.totalPage - 1) {
+        
           this.numbers = [
             1,
             '...',
@@ -114,7 +124,15 @@ export class AppComponent implements OnInit {
             '...',
             this.totalPage,
           ];
-        } else if (this.selectedPage >= 1 && this.selectedPage < 4) {
+        }else if(this.selectedPage == this.totalPage -1){
+          this.numbers = [
+            1,
+            '...',
+            Number(this.selectedPage - 1),
+            Number(this.selectedPage),
+            this.totalPage
+          ];
+        }else if (this.selectedPage >= 1 && this.selectedPage < 4) {
           this.numbers = [1, 2, 3, 4, '...', this.totalPage];
         }
 
@@ -122,7 +140,6 @@ export class AppComponent implements OnInit {
       }
     }
   }
-  // //pageSize
 
   //changePage handle
   changePage(page: number) {
@@ -155,16 +172,30 @@ export class AppComponent implements OnInit {
       );
       // this.totalRecord = this.DataSlice.length;
       this.DataSlice = dataSearch.slice(pageIndex, endPageIndex);
+      if (page == Math.ceil(dataSearch.length / this.handlePage)) {
+        this.editNext = true;
+        this.editPrev = false;
+      }
+      this.createArrayPaginationArray(dataSearch.length);
       return;
     }
+    
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
+    
   }
+
+
   // Prev page
   prevPage() {
     this.selectedPage = this.selectedPage - 1;
-    if (this.selectedPage == 1) {
+   if (this.selectedPage == 1 && this.numbers.length > 1) {
       this.editPrev = true;
-    } else {
+      this.editNext = false
+    }
+      else  if (this.selectedPage == 1) {
+      this.editPrev = true;
+    }
+     else {
       this.editPrev = false;
       this.editNext = false;
     }
@@ -174,6 +205,16 @@ export class AppComponent implements OnInit {
       (this.selectedPage - 1) * this.handlePage + this.handlePage;
 
     this.DataSlice = [];
+    if (this.userFilter) {
+      const dataSearch = this.showData.filter((data: any) =>
+        data.symbol.toString().toLowerCase().includes(this.userFilter)
+      );
+       
+      // this.totalRecord = this.DataSlice.length;
+      this.DataSlice = dataSearch.slice(pageIndex, endPageIndex);
+      this.createArrayPaginationArray(dataSearch.length);
+      return;
+    }
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
     this.createArrayPaginationArray(this.totalRecord);
   }
@@ -195,20 +236,48 @@ export class AppComponent implements OnInit {
       (this.selectedPage - 1) * this.handlePage + this.handlePage;
 
     this.DataSlice = [];
+    if (this.userFilter) {
+      const dataSearch = this.showData.filter((data: any) =>
+        data.symbol.toString().toLowerCase().includes(this.userFilter)
+      );
+      // this.totalRecord = this.DataSlice.length;
+      this.DataSlice = dataSearch.slice(pageIndex, endPageIndex);
+      if (
+        this.selectedPage === Math.ceil(dataSearch.length / this.handlePage)
+      ) {
+        this.editNext = true;
+      }
+      this.createArrayPaginationArray(dataSearch.length);
+      return;
+    }
     this.DataSlice = this.showData.slice(pageIndex, endPageIndex);
-    this.createArrayPaginationArray(this.showData);
+    this.createArrayPaginationArray(this.totalRecord);
   }
-  // sortData() {
-  //   if (this.reverse) {
-  //     this.newArray = this.DataSlice.sort(
-  //       (a: any, b: any) => b.priceChange - a.priceChange
-  //     );
-  //     this.reverse = !this.reverse;
-  //   } else if (!this.reverse) {
-  //     this.newArray = this.DataSlice.sort(
-  //       (a: any, b: any) => a.priceChange - b.priceChange
-  //     );
-  //     this.reverse = !this.reverse;
-  //   }
-  // }
+  sortId() {
+    if (this.reverse) {
+     this.newArray = this.DataSlice.sort(
+        (a: any, b: any) => b.index - a.index
+      );
+      this.reverse = !this.reverse;
+    } else if (!this.reverse) {
+      this.newArray = this.DataSlice.sort(
+        (a: any, b: any) => a.index - b.index
+      );
+      this.reverse = !this.reverse;
+    }
+  }
+  sortName(symbol:any){
+    console.log(this.isDes);
+    this.isDes = !this.isDes
+    let direction = this.isDes ? 1 : -1
+    this.DataSlice.sort(function(a:any,b:any){
+     if(a[symbol] < b[symbol]){
+          return -1 * direction
+     }
+     else if(a[symbol] > b[symbol]){
+      return 1 * direction
+     }
+     else return 0
+    })
+  }
 }
